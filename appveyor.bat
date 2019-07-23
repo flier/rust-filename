@@ -27,15 +27,6 @@ goto download
 REM vcvarsall turns echo off
 echo on
 
-mkdir windows_build_tools
-mkdir windows_build_tools\
-echo Downloading Yasm...
-powershell -Command "(New-Object Net.WebClient).DownloadFile('http://www.tortall.net/projects/yasm/releases/yasm-1.3.0-win64.exe', 'windows_build_tools\yasm.exe')"
-if %ERRORLEVEL% NEQ 0 (
-  echo ...downloading Yasm failed.
-  exit 1
-)
-
 mkdir build
 set RUSTUP_URL=https://win.rustup.rs/%TARGET_ARCH%
 set RUSTUP_EXE=build\rustup-init-%TARGET_ARCH%.exe
@@ -50,7 +41,7 @@ set TARGET=%TARGET_ARCH%-pc-windows-msvc
 %RUSTUP_EXE% -y --default-host %TARGET% --default-toolchain %RUST%
 if %ERRORLEVEL% NEQ 0 exit 1
 
-set PATH=%USERPROFILE%\.cargo\bin;%cd%\windows_build_tools;%PATH%
+set PATH=%USERPROFILE%\.cargo\bin;%PATH%
 
 if [%Configuration%] == [Release] set CARGO_MODE=--release
 
