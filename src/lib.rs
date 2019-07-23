@@ -58,34 +58,43 @@ mod win {
         T: AsRawHandle,
     {
         fn file_name(&self) -> io::Result<PathBuf> {
+            use std::ffi::OsString;
+            use std::mem;
             use std::os::windows::ffi::OsStringExt;
             use std::ptr::NonNull;
             use std::slice;
 
-            use winapi::shared::minwindef::{DWORD, FALSE};
-            use winapi::um::minwinbase::FileNameInfo;
-            use winapi::um::winbase::GetFileInformationByHandleEx;
-            use winapi::um::winnt::WCHAR;
+            use winapi::{
+                shared::minwindef::FALSE,
+                um::{
+                    fileapi::FILE_NAME_INFO, minwinbase::FileNameInfo,
+                    winbase::GetFileInformationByHandleEx, winnt::WCHAR,
+                },
+            };
 
-            let mut buf = [0; 4096];
+            let mut buf = [0u8; 4096];
             let ret = unsafe {
                 GetFileInformationByHandleEx(
                     self.as_raw_handle(),
                     FileNameInfo,
-                    &mut buf,
-                    buf.len(),
+                    buf.as_mut_ptr() as *mut _,
+                    buf.len() as u32,
                 )
             };
 
             if ret == FALSE {
                 Err(io::Error::last_os_error())
             } else {
-                let ptr = buf.as_ptr().add(mem::size_of::<DWORD>()) as *const _;
-                let len = (buf.len() - mem::size_of::<DWORD>()) / mem::size_of::<WCHAR>();
-                let filename = slice::from_raw_parts(ptr, len);
-                let end = filename.iter().position(|&n| n == 0).unwrap_or(len);
+                unsafe {
+                    let info = NonNull::new_unchecked(buf.as_mut_ptr()).cast::<FILE_NAME_INFO>();
+                    let info = info.as_ref();
+                    let filename = slice::from_raw_parts(
+                        info.FileName.as_ptr(),
+                        (info.FileNameLength as usize) / mem::size_of::<WCHAR>(),
+                    );
 
-                Ok(PathBuf::from(OsStr::from_bytes(&filename[..end])))
+                    Ok(PathBuf::from(OsString::from_wide(filename)))
+                }
             }
         }
     }
@@ -101,7 +110,7 @@ mod tests {
 
         assert_eq!(
             f.path().canonicalize().unwrap(),
-            f.as_file().file_name().unwrap()
+            f.as_file().file_name().unwrap().canonicalize().unwrap()
         );
     }
 }
