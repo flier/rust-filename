@@ -19,7 +19,7 @@ mod unix {
         fn file_name(&self) -> io::Result<PathBuf> {
             use std::path::Path;
 
-            Path::new(format!("/proc/self/fd/{}", self.as_raw_fd())).read_link()
+            Path::new(&format!("/proc/self/fd/{}", self.as_raw_fd())).read_link()
         }
     }
 
