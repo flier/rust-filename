@@ -18,5 +18,5 @@ use filename::file_name;
 
 let f = tempfile::tempfile().unwrap();
 
-println!("tempfile @ {:?}", file_name(f).unwrap());
+println!("tempfile @ {:?}", file_name(&f).unwrap());
 ```

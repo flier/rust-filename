@@ -1,6 +1,6 @@
 [package]
 name = "filename"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Flier Lu <flier.lu@gmail.com>"]
 description = "Get filename from a raw file descriptor"
 repository = "https://github.com/flier/rust-filename"

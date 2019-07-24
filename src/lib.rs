@@ -7,7 +7,7 @@
 //!
 //! let f = tempfile::tempfile().unwrap();
 //!
-//! println!("tempfile @ {:?}", file_name(f).unwrap());
+//! println!("tempfile @ {:?}", file_name(&f).unwrap());
 //! ```
 use std::io;
 use std::path::PathBuf;
@@ -20,7 +20,7 @@ pub trait Filename {
 
 /// Returns the file name of an underlying object, if there is one.
 #[cfg(unix)]
-pub fn file_name<T>(fd: T) -> io::Result<PathBuf>
+pub fn file_name<T>(fd: &T) -> io::Result<PathBuf>
 where
     T: std::os::unix::io::AsRawFd,
 {
@@ -29,7 +29,7 @@ where
 
 /// Returns the file name of an underlying object, if there is one.
 #[cfg(windows)]
-pub fn file_name<T>(fd: T) -> io::Result<PathBuf>
+pub fn file_name<T>(fd: &T) -> io::Result<PathBuf>
 where
     T: std::os::windows::io::AsRawHandle,
 {
