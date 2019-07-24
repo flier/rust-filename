@@ -1,8 +1,39 @@
+//! Get filename from a raw file descriptor
+//!
+//! # Example
+//!
+//! ```
+//! use filename::file_name;
+//!
+//! let f = tempfile::tempfile().unwrap();
+//!
+//! println!("tempfile @ {:?}", file_name(f).unwrap());
+//! ```
 use std::io;
 use std::path::PathBuf;
 
+/// OS-specific extensions to extract file name.
 pub trait Filename {
+    /// Returns the file name of an underlying object, if there is one.
     fn file_name(&self) -> io::Result<PathBuf>;
+}
+
+/// Returns the file name of an underlying object, if there is one.
+#[cfg(unix)]
+pub fn file_name<T>(fd: T) -> io::Result<PathBuf>
+where
+    T: std::os::unix::io::AsRawFd,
+{
+    fd.file_name()
+}
+
+/// Returns the file name of an underlying object, if there is one.
+#[cfg(windows)]
+pub fn file_name<T>(fd: T) -> io::Result<PathBuf>
+where
+    T: std::os::windows::io::AsRawHandle,
+{
+    fd.file_name()
 }
 
 #[cfg(unix)]

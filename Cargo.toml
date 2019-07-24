@@ -2,9 +2,18 @@
 name = "filename"
 version = "0.1.0"
 authors = ["Flier Lu <flier.lu@gmail.com>"]
+description = "Get filename from a raw file descriptor"
+repository = "https://github.com/flier/rust-filename"
+readme = "README.md"
+keywords = ["filename"]
+categories = ["filesystem", "os"]
+license = "MIT"
+license-file = "LICENSE"
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[badges]
+appveyor = { repository = "flier/rust-filename", branch = "master", service = "github" }
+travis-ci = { repository = "flier/rust-filename", branch = "master" }
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"
